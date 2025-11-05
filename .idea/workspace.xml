@@ -4,15 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b27c3657-64c1-476b-be79-c3601de02c12" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Ejercicios resueltos/POO/Restaurante_DeliciasDelMar.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Ejercicios resueltos/POO/Restaurante_DeliciosoSabor.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/Algoritmos2_UNSAM.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Algoritmos2_UNSAM.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Ejercicios resueltos/POO/Lamparita.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/Ejercicios resueltos/POO/Lamparita.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Ejercicios resueltos/POO/Monedero.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/Ejercicios resueltos/POO/Monedero.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Ejercicios resueltos/POO/Retaurante.ipynb" beforeDir="false" />
-    </list>
+    <list default="true" id="b27c3657-64c1-476b-be79-c3601de02c12" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -114,6 +106,7 @@
       <workItem from="1755040079882" duration="10553000" />
       <workItem from="1756341519410" duration="1698000" />
       <workItem from="1757450907031" duration="372000" />
+      <workItem from="1760333891746" duration="38000" />
     </task>
     <servers />
   </component>

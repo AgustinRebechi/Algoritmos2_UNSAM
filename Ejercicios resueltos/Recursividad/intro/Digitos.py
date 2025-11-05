@@ -9,6 +9,7 @@ def cant(N):
 print(cant(194180))
 
 # b)
+
 def dig (N):
     if N < 10: return 1
     return dig (N // 10) + 1
