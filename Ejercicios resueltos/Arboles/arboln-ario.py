@@ -1,3 +1,4 @@
+from functools import reduce
 from typing import Any, Generic, TypeVar
 
 T = TypeVar('T')
@@ -160,6 +161,185 @@ class ArbolN(Generic[T]):
             self.dato == otro.dato and
             bosques_iguales(self.subarboles, otro.subarboles)
         )
+    # ============================================
+    # PREORDER (del documento)
+    # ============================================
+    
+    def preorder_funcional(self) -> list[T]:
+        """
+        PREORDER con reduce (versión funcional del documento)
+        
+        Lógica:
+        1. Empiezo con [mi_dato]
+        2. Para cada subárbol, concateno su preorder
+        """
+        return reduce(
+            lambda recorrido, subarbol: recorrido + subarbol.preorder_funcional(), 
+            self.subarboles, 
+            [self.dato]
+        )
+    
+    def preorder_imperativo(self) -> list[T]:
+        """
+        PREORDER con loop (versión imperativa del documento)
+        
+        Lógica:
+        1. Visito la raíz (agrego mi dato)
+        2. Visito todos mis subárboles de izquierda a derecha
+        """
+        recorrido = [self.dato]  # Primero YO
+        for subarbol in self.subarboles:  # Luego MIS HIJOS
+            recorrido += subarbol.preorder_imperativo()
+        return recorrido
+    
+    def preorder_mutua(self) -> list[T]:
+        """
+        PREORDER con recursión mutua (versión del documento)
+        
+        Usa dos funciones:
+        - preorder: procesa UN árbol
+        - preorder_n: procesa UNA LISTA de árboles
+        """
+        def preorder_n(bosque: list['ArbolN[T]']) -> list[T]:
+            """Procesa una lista de árboles"""
+            if not bosque:
+                return []
+            else:
+                # Primer árbol + resto recursivamente
+                return bosque[0].preorder_mutua() + preorder_n(bosque[1:])
+
+        # Mi dato + mis subárboles
+        return [self.dato] + preorder_n(self.subarboles)
+    
+    # ============================================
+    # EJERCICIO 1: POSTORDER
+    # ============================================
+    
+    def postorder_directo(self) -> list[T]:
+        """
+        POSTORDER con recursión múltiple directa
+        
+        Lógica:
+        1. Visito todos mis subárboles primero
+        2. Luego visito la raíz (yo)
+        """
+        recorrido = []
+        
+        # Primero MIS HIJOS
+        for subarbol in self.subarboles:
+            recorrido += subarbol.postorder_directo()
+        
+        # Luego YO
+        recorrido.append(self.dato)
+        
+        return recorrido
+    
+    def postorder_funcional(self) -> list[T]:
+        """
+        POSTORDER con reduce (versión funcional)
+        """
+        return reduce(
+            lambda recorrido, subarbol: recorrido + subarbol.postorder_funcional(),
+            self.subarboles,
+            []  # Empiezo con lista vacía
+        ) + [self.dato]  # Agrego mi dato AL FINAL
+    
+    def postorder_mutua(self) -> list[T]:
+        """
+        POSTORDER con recursión mutua
+        
+        Usa dos funciones:
+        - postorder: procesa UN árbol
+        - postorder_n: procesa UNA LISTA de árboles
+        """
+        def postorder_n(bosque: list['ArbolN[T]']) -> list[T]:
+            """Procesa una lista de árboles"""
+            if not bosque:
+                return []
+            else:
+                # Primer árbol + resto recursivamente
+                return bosque[0].postorder_mutua() + postorder_n(bosque[1:])
+        
+        # Mis subárboles + mi dato (AL REVÉS que preorder)
+        return postorder_n(self.subarboles) + [self.dato]
+    
+    # ============================================
+    # BFS (del documento)
+    # ============================================
+    
+    def bfs_original(self) -> list[T]:
+        """
+        BFS original del documento (usa visitar, no devuelve)
+        Adaptado para devolver lista
+        """
+        resultado = []
+        
+        def recorrer():
+            if q:
+                actual = q.pop()                    # desencolar árbol visitado
+                resultado.append(actual.dato)       # visitar
+                for subarbol in actual.subarboles:  # para cada subárbol
+                    q.insert(0, subarbol)           # encolar subárbol
+                recorrer()
+        
+        q: list['ArbolN[T]'] = [self]               # encolar raíz
+        recorrer()
+        return resultado
+    
+    # ============================================
+    # EJERCICIO 2: BFS que devuelve lista
+    # ============================================
+    
+    def bfs(self) -> list[T]:
+        """
+        BFS iterativo (más claro)
+        
+        Usa una COLA (FIFO):
+        1. Encolo la raíz
+        2. Mientras haya elementos en la cola:
+           a. Desencolo
+           b. Visito (agrego a resultado)
+           c. Encolo todos sus hijos
+        """
+        if self.es_hoja():
+            return [self.dato]
+        
+        resultado = []
+        cola = [self]  # Empiezo con la raíz
+        
+        while cola:
+            actual = cola.pop(0)  # Desencolo (FIFO)
+            resultado.append(actual.dato)  # Visito
+            
+            # Encolo TODOS los hijos
+            for subarbol in actual.subarboles:
+                cola.append(subarbol)
+        
+        return resultado
+    
+    def bfs_recursivo(self) -> list[T]:
+        """
+        BFS recursivo (versión del documento mejorada)
+        """
+        def recorrer_cola(cola: list['ArbolN[T]'], acumulado: list[T]) -> list[T]:
+            """Recursión de cola con acumulador"""
+            if not cola:
+                return acumulado
+            
+            actual = cola.pop(0)  # Desencolo
+            acumulado.append(actual.dato)  # Visito
+            
+            # Encolo todos los hijos
+            for subarbol in actual.subarboles:
+                cola.append(subarbol)
+            
+            return recorrer_cola(cola, acumulado)
+        
+        return recorrer_cola([self], [])
+
+
+
+
     
     # ============================================
     # UTILIDADES PARA TESTING
@@ -348,6 +528,175 @@ if __name__ == "__main__":
     
     print(f"¿Son iguales? {arbol6 == arbol7}")
     print(f"Esperado: False (estructura diferente)")
+    print()
+    # ============================================
+    # PREORDER
+    # ============================================
+    
+    print("=" * 70)
+    print("PREORDER (Raíz → Hijos)")
+    print("=" * 70)
+    print()
+    
+    pre_func = arbol1.preorder_funcional()
+    pre_imp = arbol1.preorder_imperativo()
+    pre_mut = arbol1.preorder_mutua()
+    
+    print("Versiones de PREORDER:")
+    print(f"  Funcional (reduce):  {pre_func}")
+    print(f"  Imperativo (loop):   {pre_imp}")
+    print(f"  Mutua (recursión):   {pre_mut}")
+    print()
+    
+    print("Verificación:")
+    todas_iguales = pre_func == pre_imp == pre_mut
+    print(f"  {'✓ Todas iguales' if todas_iguales else '✗ Diferentes'}")
+    print(f"  Esperado: ['A', 'B', 'E', 'C', 'D']")
+    print()
+    
+    print("Explicación del orden:")
+    print("  1. Visito A (raíz)")
+    print("  2. Visito subárbol B:")
+    print("     2.1. Visito B")
+    print("     2.2. Visito subárbol E:")
+    print("          2.2.1. Visito E (hoja)")
+    print("  3. Visito subárbol C:")
+    print("     3.1. Visito C (hoja)")
+    print("  4. Visito subárbol D:")
+    print("     4.1. Visito D (hoja)")
+    print()
+    
+    # ============================================
+    # EJERCICIO 1: POSTORDER
+    # ============================================
+    
+    print("=" * 70)
+    print("POSTORDER (Hijos → Raíz)")
+    print("=" * 70)
+    print()
+    
+    post_dir = arbol1.postorder_directo()
+    post_func = arbol1.postorder_funcional()
+    post_mut = arbol1.postorder_mutua()
+    
+    print("Versiones de POSTORDER:")
+    print(f"  Directo (loop):      {post_dir}")
+    print(f"  Funcional (reduce):  {post_func}")
+    print(f"  Mutua (recursión):   {post_mut}")
+    print()
+    
+    print("Verificación:")
+    todas_iguales = post_dir == post_func == post_mut
+    print(f"  {'✓ Todas iguales' if todas_iguales else '✗ Diferentes'}")
+    print(f"  Esperado: ['E', 'B', 'C', 'D', 'A']")
+    print()
+    
+    print("Explicación del orden:")
+    print("  1. Proceso subárbol B:")
+    print("     1.1. Proceso subárbol E:")
+    print("          1.1.1. E es hoja → Visito E")
+    print("     1.2. Visito B")
+    print("  2. Proceso subárbol C:")
+    print("     2.1. C es hoja → Visito C")
+    print("  3. Proceso subárbol D:")
+    print("     3.1. D es hoja → Visito D")
+    print("  4. Visito A (raíz al final)")
+    print()
+    
+    # ============================================
+    # EJERCICIO 2: BFS
+    # ============================================
+    
+    print("=" * 70)
+    print("BFS (Por niveles)")
+    print("=" * 70)
+    print()
+    
+    bfs_orig = arbol1.bfs_original()
+    bfs_iter = arbol1.bfs()
+    bfs_rec = arbol1.bfs_recursivo()
+
+    print("Versiones de BFS:")
+    print(f"  Original (doc):      {bfs_orig}")
+    print(f"  Iterativo:           {bfs_iter}")
+    print(f"  Recursivo:           {bfs_rec}")
+    print()
+    
+    print("Verificación:")
+    todas_iguales = bfs_orig == bfs_iter == bfs_rec
+    print(f"  {'✓ Todas iguales' if todas_iguales else '✗ Diferentes'}")
+    print(f"  Esperado: ['A', 'B', 'C', 'D', 'E']")
+    print()
+    
+    print("Explicación del orden (por niveles):")
+    print("  Nivel 0: A")
+    print("  Nivel 1: B, C, D")
+    print("  Nivel 2: E")
+    print("  Concatenado: A, B, C, D, E")
+    print()
+    
+    # ============================================
+    # COMPARACIÓN DE RECORRIDOS
+    # ============================================
+    
+    print("=" * 70)
+    print("COMPARACIÓN DE TODOS LOS RECORRIDOS")
+    print("=" * 70)
+    print()
+    
+    print(f"Árbol: {repr(arbol1)}")
+    print()
+    print(f"PREORDER:  {pre_func}")
+    print(f"POSTORDER: {post_dir}")
+    print(f"BFS:       {bfs_iter}")
+    print()
+    
+    # ============================================
+    # ÁRBOL MÁS COMPLEJO
+    # ============================================
+    
+    print("=" * 70)
+    print("ÁRBOL MÁS COMPLEJO")
+    print("=" * 70)
+    print()
+    
+    # Construir:
+    #         1
+    #       / | \
+    #      2  3  4
+    #     /|  |  |\
+    #    5 6  7  8 9
+    
+    raiz = ArbolN(1)
+    
+    n2 = ArbolN(2)
+    n2.insertar_subarbol(ArbolN(5))
+    n2.insertar_subarbol(ArbolN(6))
+    
+    n3 = ArbolN(3)
+    n3.insertar_subarbol(ArbolN(7))
+    
+    n4 = ArbolN(4)
+    n4.insertar_subarbol(ArbolN(8))
+    n4.insertar_subarbol(ArbolN(9))
+    
+    raiz.insertar_subarbol(n2)
+    raiz.insertar_subarbol(n3)
+    raiz.insertar_subarbol(n4)
+    
+    print("Árbol:")
+    print(raiz)
+    
+    print("Recorridos:")
+    print(f"  PREORDER:  {raiz.preorder_imperativo()}")
+    print(f"  POSTORDER: {raiz.postorder_directo()}")
+    print(f"  BFS:       {raiz.bfs()}")
+    print()
+    
+    print("Esperados:")
+    print(f"  PREORDER:  [1, 2, 5, 6, 3, 7, 4, 8, 9]")
+    print(f"  POSTORDER: [5, 6, 2, 7, 3, 8, 9, 4, 1]")
+    print(f"  BFS:       [1, 2, 3, 4, 5, 6, 7, 8, 9]")
     print()
     
     # ============================================
