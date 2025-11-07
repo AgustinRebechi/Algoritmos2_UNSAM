@@ -337,6 +337,17 @@ class ArbolN(Generic[T]):
         
         return recorrer_cola([self], [])
 
+    # ============================================
+    # COPY
+    # ============================================
+
+    def copy(self) -> 'ArbolN[T]':
+        """
+        Con list comprehension (más compacta)
+        """
+        nuevo_arbol = ArbolN(self.dato)
+        nuevo_arbol.subarboles = [sub.copy_v2() for sub in self.subarboles]
+        return nuevo_arbol
 
 
 
