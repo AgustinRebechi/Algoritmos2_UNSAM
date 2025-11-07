@@ -268,7 +268,94 @@ class ArbolBinario(Generic[T]):
         if self.es_hoja():
             return f"[{self.dato()}]"
         return f"({self.dato()}: {self.si().__repr__()} | {self.sd().__repr__()})"        
+    
+    # Ejercicio 4: Bottom-up
 
+    def bottom_up(self) -> List[T]:
+        """
+        Recorrido desde las hojas hasta la raíz, de izquierda a derecha.
+        
+        Estrategia 1: BFS invertido
+        - Hacer BFS normal
+        - Invertir el resultado
+        
+        Ejemplo:
+                 4
+               /   \\
+              2     5
+             / \\     \\
+            1   3     7
+                     / \\
+                    6   8
+        
+        BFS normal:  [4, 2, 5, 1, 3, 7, 6, 8]
+        Bottom-up:   [1, 3, 6, 8, 2, 7, 5, 4]
+        """
+        if self.es_vacio():
+            return []
+        
+        # Usar BFS pero guardar en orden inverso
+        resultado = []
+        cola = [self]
+        
+        while cola:
+            actual = cola.pop(0)
+            
+            if not actual.es_vacio():
+                # Insertar al INICIO en vez de al final
+                resultado.insert(0, actual.dato())
+                
+                # Importante: encolar primero derecho, luego izquierdo
+                # para que al invertir queden en el orden correcto
+                cola.append(actual.si())
+                cola.append(actual.sd())
+        
+        return resultado
+    
+    # Ejercicio 5: Eliminar recursion en DFS inorder (usar recursion de cola)
+
+    def inorder_iterativo(self) -> List[T]:
+        """
+        Inorder iterativo usando pila explícita.
+        
+        Estrategia:
+        1. Ir lo más a la izquierda posible, apilando nodos
+        2. Cuando no puedo ir más a la izquierda:
+           a. Desapilar y visitar
+           b. Ir a la derecha
+        3. Repetir
+        
+        Simula exactamente lo que hace la recursión:
+        - La pila reemplaza la pila de recursión
+        - "Ir a la izquierda" = antes de visitar
+        - "Visitar" = cuando vuelvo de la izquierda
+        - "Ir a la derecha" = después de visitar
+        """
+        if self.es_vacio():
+            return []
+        
+        resultado = []
+        pila: List[ArbolBinario[T]] = []
+        actual = self
+        
+        while True:
+            # FASE 1: Ir lo más a la izquierda posible
+            while not actual.es_vacio():
+                pila.append(actual)
+                actual = actual.si()
+            
+            # FASE 2: Si la pila está vacía, terminamos
+            if not pila:
+                break
+            
+            # FASE 3: Desapilar y visitar
+            actual = pila.pop()
+            resultado.append(actual.dato())
+            
+            # FASE 4: Ir a la derecha
+            actual = actual.sd()
+        
+        return resultado
 
 
     
